@@ -6,13 +6,13 @@ async function init() {
   let currentGuess = "";
   let currentRow = 0;
 
-  const res = await fetch("https://words.dev-apis.com/word-of-the-day");
+  const res = await fetch("https://words.dev-apis.com/word-of-the-day");// add ?random=1 to the api to get random words
   const resObj = await res.json();
   const word = resObj.word.toUpperCase();
   const wordParts = word.split("");
   let done = false;
 
-  console.log(word);
+  // console.log(word);// if you want to see the word 
 
   function addLetter(letter) {
     if (currentGuess.length < ANSWER_LENGTH) {
@@ -72,7 +72,6 @@ async function init() {
     currentRow++;
 
     if (currentGuess === word) {
-      alert("You win !!!");
       document.querySelector(".wordle-h1").classList.add("winner");
       done = true;
     } else if (currentRow === ROUNDS) {
@@ -88,8 +87,6 @@ async function init() {
   }
 
   function markInvalidWord() {
-    // alert('Not a valid word')
-
     for (let i = 0; i < ANSWER_LENGTH; i++) {
       letters[currentRow * ANSWER_LENGTH + i].classList.remove("invalid");
       setTimeout(function () {
