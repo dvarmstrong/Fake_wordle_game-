@@ -1,5 +1,6 @@
 const letters = document.querySelectorAll(".word-containers")
 const ANSWER_LENGTH = 5;
+const ROUNDS = 6;
 
 async function init () {
   let currentGuess = '';
@@ -10,6 +11,8 @@ async function init () {
   const resObj = await res.json();
   const word = resObj.word.toUpperCase();
   const wordParts = word.split("");
+  let done = false;
+
 
   console.log(word)
 
@@ -31,9 +34,25 @@ async function init () {
       // do nothing
       return;
     }
+    
+
     // TODO validate the word
+    const res = await fetch("https://words.dev-apis.com/validate-word", {
+      method: "POST",
+      body: JSON.stringify({word: currentGuess })
+    });
+
+    const resObj = await res.json();
+    const validWord = resObj.validWord;
+
+    if( !validWord ){
+      markInvalidWord();
+      return
+    }
+
+
   
-    // TODO do all the marking as correct close, or wrong 
+
 
     const guessParts = currentGuess.split("");
     const map = makeMap(wordParts);
@@ -56,13 +75,17 @@ async function init () {
         letters[currentRow * ANSWER_LENGTH + i].classList.add("wrong")
       }
     }
-
-
-
-  
-    // TODO  did they win or lose 
-
     currentRow++;
+    
+    if(currentGuess === word) {
+      alert('You win !!!');
+      document.querySelector('.wordle-h1').classList.add("winner")
+      done = true
+      
+    }else if (currentRow === ROUNDS) {
+      alert(`you lose, the word was ${word}`);
+      done = true;
+    }
     currentGuess = '';
   }
 
@@ -71,8 +94,22 @@ async function init () {
     letters[ANSWER_LENGTH * currentRow + currentGuess.length].innerText = '';
   }
 
+  function markInvalidWord () {
+    // alert('Not a valid word')
+
+    for(let i = 0; i < ANSWER_LENGTH; i++ ) {
+      letters[currentRow * ANSWER_LENGTH + i].classList.remove("invalid")
+      setTimeout(function () {
+        letters[currentRow * ANSWER_LENGTH + i].classList.add("invalid")
+      },10)
+    }
+  };
+
 
   document.addEventListener( 'keydown', function handleKeyPress (event) {
+    if(done){
+      return;
+    }
     const action = event.key;
    
 
@@ -128,10 +165,3 @@ init();
 
 
 
-// const options = {method: 'GET'};
-
-// fetch('https://words.dev-apis.com/word-of-the-day', options)
-//   .then(response => response.json())
-//   .then(data => console.log(data))
-//   .then(response => console.log(response))
-//   .catch(err => console.error(err));

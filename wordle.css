@@ -59,3 +59,87 @@ body {
     color: white;
 }
 
+.invalid {
+    animation: flash 2s;
+}
+
+/* flashes red border and then fades back to gray */
+@keyframes flash {
+    5% {
+        border-color: crimson;
+    }
+
+    100% {
+        border-color: #ccc;
+    }
+}
+
+.spiral {
+    font-size: 40px;
+    animation: spin 1.5s linear infinite;
+}
+
+/* rotates clockwise indefinitely */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* winner animation */
+
+@keyframes rainbow {
+
+    100%,
+    0% {
+        color: rgb(255, 0, 0);
+    }
+
+    8% {
+        color: rgb(255, 127, 0);
+    }
+
+    16% {
+        color: rgb(255, 255, 0);
+    }
+
+    25% {
+        color: rgb(127, 255, 0);
+    }
+
+    33% {
+        color: rgb(0, 255, 0);
+    }
+
+    41% {
+        color: rgb(0, 255, 127);
+    }
+
+    50% {
+        color: rgb(0, 255, 255);
+    }
+
+    58% {
+        color: rgb(0, 127, 255);
+    }
+
+    66% {
+        color: rgb(0, 0, 255);
+    }
+
+    75% {
+        color: rgb(127, 0, 255);
+    }
+
+    83% {
+        color: rgb(255, 0, 255);
+    }
+
+    91% {
+        color: rgb(255, 0, 127);
+    }
+}
+
+.winner {
+    animation: rainbow 4s infinite linear;
+}
