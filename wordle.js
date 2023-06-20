@@ -1,11 +1,10 @@
-const letters = document.querySelectorAll(".word-containers")
+const letters = document.querySelectorAll(".word-containers");
 const ANSWER_LENGTH = 5;
 const ROUNDS = 6;
 
-async function init () {
-  let currentGuess = '';
-  let currentRow =  0;
-
+async function init() {
+  let currentGuess = "";
+  let currentRow = 0;
 
   const res = await fetch("https://words.dev-apis.com/word-of-the-day");
   const resObj = await res.json();
@@ -13,129 +12,121 @@ async function init () {
   const wordParts = word.split("");
   let done = false;
 
-
-  console.log(word)
-
+  console.log(word);
 
   function addLetter(letter) {
-    if(currentGuess.length < ANSWER_LENGTH) {
-      // adds letter to the end 
+    if (currentGuess.length < ANSWER_LENGTH) {
+      // adds letter to the end
       currentGuess += letter;
-    }else {
-      // replaces the last letter 
-      currentGuess = currentGuess.substring(0, currentGuess.length - 1) + letter; 
+    } else {
+      // replaces the last letter
+      currentGuess =
+        currentGuess.substring(0, currentGuess.length - 1) + letter;
     }
 
-    letters[ANSWER_LENGTH * currentRow + currentGuess.length - 1].innerText = letter; 
+    letters[ANSWER_LENGTH * currentRow + currentGuess.length - 1].innerText =
+      letter;
   }
 
   async function commit() {
-    if(currentGuess.length != ANSWER_LENGTH) {
+    if (currentGuess.length != ANSWER_LENGTH) {
       // do nothing
       return;
     }
-    
 
     // TODO validate the word
     const res = await fetch("https://words.dev-apis.com/validate-word", {
       method: "POST",
-      body: JSON.stringify({word: currentGuess })
+      body: JSON.stringify({ word: currentGuess }),
     });
 
     const resObj = await res.json();
     const validWord = resObj.validWord;
 
-    if( !validWord ){
+    if (!validWord) {
       markInvalidWord();
-      return
+      return;
     }
-
-
-  
-
 
     const guessParts = currentGuess.split("");
     const map = makeMap(wordParts);
 
-    for (let i = 0; i < ANSWER_LENGTH; i++ ) {
-      // mark as correct 
-      if(guessParts[i] === wordParts[i]) {
-        letters[currentRow * ANSWER_LENGTH + i].classList.add("correct")
+    for (let i = 0; i < ANSWER_LENGTH; i++) {
+      // mark as correct
+      if (guessParts[i] === wordParts[i]) {
+        letters[currentRow * ANSWER_LENGTH + i].classList.add("correct");
         map[guessParts[i]]--;
       }
     }
 
-    for( let i = 0; i < ANSWER_LENGTH; i++) {
-      if(guessParts[i] === wordParts[i]) {
-        //do nothing 
+    for (let i = 0; i < ANSWER_LENGTH; i++) {
+      if (guessParts[i] === wordParts[i]) {
+        //do nothing
       } else if (wordParts.includes(guessParts[i]) && map[guessParts[i]] > 0) {
-        letters[currentRow * ANSWER_LENGTH + i].classList.add("close")
+        letters[currentRow * ANSWER_LENGTH + i].classList.add("close");
         map[guessParts[i]]--;
-      }else {
-        letters[currentRow * ANSWER_LENGTH + i].classList.add("wrong")
+      } else {
+        letters[currentRow * ANSWER_LENGTH + i].classList.add("wrong");
       }
     }
     currentRow++;
-    
-    if(currentGuess === word) {
-      alert('You win !!!');
-      document.querySelector('.wordle-h1').classList.add("winner")
-      done = true
-      
-    }else if (currentRow === ROUNDS) {
+
+    if (currentGuess === word) {
+      alert("You win !!!");
+      document.querySelector(".wordle-h1").classList.add("winner");
+      done = true;
+    } else if (currentRow === ROUNDS) {
       alert(`you lose, the word was ${word}`);
       done = true;
     }
-    currentGuess = '';
+    currentGuess = "";
   }
 
-  function backspace () {
+  function backspace() {
     currentGuess = currentGuess.substring(0, currentGuess.length - 1);
-    letters[ANSWER_LENGTH * currentRow + currentGuess.length].innerText = '';
+    letters[ANSWER_LENGTH * currentRow + currentGuess.length].innerText = "";
   }
 
-  function markInvalidWord () {
+  function markInvalidWord() {
     // alert('Not a valid word')
 
-    for(let i = 0; i < ANSWER_LENGTH; i++ ) {
-      letters[currentRow * ANSWER_LENGTH + i].classList.remove("invalid")
+    for (let i = 0; i < ANSWER_LENGTH; i++) {
+      letters[currentRow * ANSWER_LENGTH + i].classList.remove("invalid");
       setTimeout(function () {
-        letters[currentRow * ANSWER_LENGTH + i].classList.add("invalid")
-      },10)
+        letters[currentRow * ANSWER_LENGTH + i].classList.add("invalid");
+      }, 10);
     }
-  };
+  }
 
-
-  document.addEventListener( 'keydown', function handleKeyPress (event) {
-    if(done){
+  document.addEventListener("keydown", function handleKeyPress(event) {
+    if (done) {
       return;
     }
     const action = event.key;
-   
 
-    if(action === 'Enter') {
+    if (action === "Enter") {
       commit();
-    }else if( action === 'Backspace') {
+    } else if (action === "Backspace") {
       backspace();
-    }else if (isLetter(action)) {
-      addLetter(action.toUpperCase())
+    } else if (isLetter(action)) {
+      addLetter(action.toUpperCase());
     } else {
-      // do nothing 
+      // do nothing
     }
-  })
+  });
 }
 
 function isLetter(letter) {
   return /^[a-zA-Z]$/.test(letter);
 }
 
-function makeMap (array) {
+function makeMap(array) {
   const obj = {};
-  for(let i = 0; i < array.length; i++) {
-    const letter =array[i];
-    if(obj[letter]) {
+  for (let i = 0; i < array.length; i++) {
+    const letter = array[i];
+    if (obj[letter]) {
       obj[letter]++;
-    }else {
+    } else {
       obj[letter] = 1;
     }
   }
@@ -143,25 +134,3 @@ function makeMap (array) {
 }
 
 init();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
